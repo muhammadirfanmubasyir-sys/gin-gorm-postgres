@@ -5,10 +5,10 @@ services:
    volumes:
      - pgdata:/var/lib/postgresql/data
    ports:
-     - "5432:5555"
+     - "5555:5555"
    environment:
-    - POSTGRES_PASSWORD:password
-    - POSTGRES_DB:postgres
+    - POSTGRES_PASSWORD:bismillah
+    - POSTGRES_DB:irfan-db
     - POSTGRES_USER:postgres
 volumes:
   pgdata:
