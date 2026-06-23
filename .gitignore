@@ -1,0 +1,15 @@
+# Environment variables
+.env
+
+# Go
+bin/
+*.o
+*.a
+*.so
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

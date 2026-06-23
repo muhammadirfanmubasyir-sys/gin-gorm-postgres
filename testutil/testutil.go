@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/glebarez/sqlite"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/config"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/routes"
-	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -38,10 +38,14 @@ func SeedUser(t *testing.T, db *gorm.DB, name, email, password string) models.Us
 	t.Helper()
 
 	user := models.User{
-		Name:     name,
-		Email:    email,
-		Password: password,
+		Name:  name,
+		Email: email,
 	}
+
+	if err := user.HashPassword(password); err != nil {
+		t.Fatalf("failed to hash password: %v", err)
+	}
+
 	if err := db.Create(&user).Error; err != nil {
 		t.Fatalf("failed to seed user: %v", err)
 	}
