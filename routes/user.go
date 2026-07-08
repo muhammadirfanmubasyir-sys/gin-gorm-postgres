@@ -5,8 +5,10 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/config"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/controller"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware"
+	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/repository"
 )
 
 func UserRoute(router *gin.Engine) {
@@ -21,12 +23,15 @@ func UserRoute(router *gin.Engine) {
 	}
 	router.Use(middleware.RateLimit(rateLimit))
 
+	repo := repository.NewUserRepositoryGorm(config.DB)
+	ctl := controller.NewUserController(repo)
+
 	v1 := router.Group("/api/v1")
 	{
-		v1.GET("/users", controller.ListUser)
-		v1.GET("/users/:id", controller.GetUser)
-		v1.POST("/users", controller.CreateUser)
-		v1.DELETE("/users/:id", controller.DeleteUser)
-		v1.PUT("/users/:id", controller.UpdateUser)
+		v1.GET("/users", ctl.ListUser)
+		v1.GET("/users/:id", ctl.GetUser)
+		v1.POST("/users", ctl.CreateUser)
+		v1.DELETE("/users/:id", ctl.DeleteUser)
+		v1.PUT("/users/:id", ctl.UpdateUser)
 	}
 }

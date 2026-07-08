@@ -32,11 +32,37 @@ func Connect() {
 		requireEnv("DB_SSLMODE"),
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	ConnectWithDialector(postgres.Open(dsn))
+}
+
+func ConnectWithDriver(driver, dsn string) {
+	var dialector gorm.Dialector
+	switch driver {
+	case "postgres":
+		dialector = postgres.Open(dsn)
+	default:
+		panic(fmt.Sprintf("unsupported database driver: %s", driver))
+	}
+
+	ConnectWithDialector(dialector)
+}
+
+func ConnectWithDialector(dialector gorm.Dialector) {
+	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		panic(fmt.Sprintf("failed to connect to database: %v", err))
 	}
 
+	configureConnectionPool(db)
+
+	if err := db.AutoMigrate(&models.User{}); err != nil {
+		panic(fmt.Sprintf("failed to auto-migrate: %v", err))
+	}
+
+	DB = db
+}
+
+func configureConnectionPool(db *gorm.DB) {
 	sqlDB, err := db.DB()
 	if err != nil {
 		panic(fmt.Sprintf("failed to get underlying sql.DB: %v", err))
@@ -58,12 +84,6 @@ func Connect() {
 	sqlDB.SetMaxOpenConns(maxOpen)
 	sqlDB.SetMaxIdleConns(maxIdle)
 	sqlDB.SetConnMaxLifetime(time.Duration(connMaxLifeSec) * time.Second)
-
-	if err := db.AutoMigrate(&models.User{}); err != nil {
-		panic(fmt.Sprintf("failed to auto-migrate: %v", err))
-	}
-
-	DB = db
 }
 
 func Close() {

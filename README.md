@@ -19,24 +19,33 @@ A production-ready REST API for user management built with Gin, GORM, and Postgr
 ├── config/
 │   └── db.go               # Database connection, pooling, migration
 ├── controller/
-│   └── user.go             # User CRUD handlers
+│   ├── user.go             # User CRUD handlers (dependency injected)
+│   ├── user_test.go        # Controller tests with mock repository
+│   ├── validate_test.go    # Validation unit tests
+│   └── testhelper.go       # Test helper for mock router setup
 ├── dto/
 │   ├── user.go             # Request/response DTOs
 │   └── response.go         # Standard success/error response wrappers
 ├── middleware/
 │   ├── cors.go             # CORS configuration
-│   ├── logger.go           # Request logging
 │   ├── ratelimit.go        # Per-IP rate limiting
 │   ├── requestid.go        # UUID request ID
 │   └── security.go         # Security headers
 ├── models/
 │   └── user.go             # User model, password hashing
+├── repository/
+│   ├── user.go             # UserRepository interface
+│   ├── user_gorm.go        # GORM implementation
+│   ├── mock.go             # Mock implementation for tests
+│   └── repository_test.go  # Repository tests
 ├── routes/
-│   └── user.go             # Route registration
+│   └── user.go             # Route registration, dependency wiring
 ├── testutil/
 │   ├── testutil.go         # Test helpers (DB, router, seed)
 │   └── testutil_test.go    # Test helper tests
 ├── docker-compose.yaml     # PostgreSQL service
+├── integration/
+│   └── integration_test.go # Full-stack integration tests
 ├── .env.example            # Environment variable template
 └── go.mod
 ```
@@ -268,17 +277,45 @@ Applied in order on every request:
 ## Testing
 
 ```bash
+# Run all tests (unit + integration)
 go test ./... -v
+
+# Run only unit tests
+go test ./controller/ ./models/ ./routes/ ./dto/ ./middleware/ ./config/ ./repository/ -v
+
+# Run only integration tests
+go test ./integration/ -v
+
+# Generate coverage report
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out -o=coverage.html
 ```
 
-Tests use an in-memory SQLite database — no external dependencies needed.
+### Unit Tests (mock repository, in-memory SQLite)
 
 ```
-controller  — 19 tests (CRUD flow, validation, error cases)
-models      — 1 test  (table name)
-routes      — 1 test  (endpoint registration)
-testutil    — 14 tests (DB setup, seeding, isolation)
+config      — 94.4% (env validation, connection pooling, close)
+controller  — 94.1% (CRUD flow, validation, repo errors, all branches)
+dto         — 100%  (response marshaling, DTOs)
+middleware  — 100%  (CORS, rate limit, security headers, request ID)
+models      — 85.7% (table name, password hashing, verification)
+repository  — 95.2% (GORM impl + mock, all CRUD operations)
+routes      — 94.1% (endpoint registration)
+testutil    — 78.9% (DB setup, router, seeding)
 ```
+
+### Integration Tests (real GORM repository, in-memory SQLite)
+
+```
+integration — 18 tests covering:
+  - Full CRUD lifecycle (create → get → update → delete → list)
+  - All validation error paths (7 cases)
+  - Not-found and invalid-ID scenarios
+  - Password never exposed in JSON responses
+  - Concurrent write handling
+```
+
+**Total coverage: 90.4%**
 
 ## Production Features
 
@@ -291,3 +328,5 @@ testutil    — 14 tests (DB setup, seeding, isolation)
 - Health check endpoint
 - Input validation with clear error messages
 - Password hashing with bcrypt
+- Repository pattern with dependency injection
+- 90%+ test coverage with mock repository
