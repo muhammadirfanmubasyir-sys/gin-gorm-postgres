@@ -66,7 +66,7 @@ func TestListUser_Empty(t *testing.T) {
 	testutil.SetupTestDB(t)
 	router := testutil.SetupRouter()
 
-	rec := performRequest(router, http.MethodGet, "/users", "")
+	rec := performRequest(router, http.MethodGet, "/api/v1/users", "")
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -81,7 +81,7 @@ func TestListUser_WithUsers(t *testing.T) {
 	testutil.SeedUser(t, db, "Alice", "alice@example.com", "secret1")
 	testutil.SeedUser(t, db, "Bob", "bob@example.com", "secret2")
 
-	rec := performRequest(router, http.MethodGet, "/users", "")
+	rec := performRequest(router, http.MethodGet, "/api/v1/users", "")
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -97,7 +97,7 @@ func TestGetUser_Found(t *testing.T) {
 
 	user := testutil.SeedUser(t, db, "Alice", "alice@example.com", "secret")
 
-	rec := performRequest(router, http.MethodGet, fmt.Sprintf("/users/%d", user.Id), "")
+	rec := performRequest(router, http.MethodGet, fmt.Sprintf("/api/v1/users/%d", user.Id), "")
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -111,7 +111,7 @@ func TestGetUser_NotFound(t *testing.T) {
 	testutil.SetupTestDB(t)
 	router := testutil.SetupRouter()
 
-	rec := performRequest(router, http.MethodGet, "/users/999", "")
+	rec := performRequest(router, http.MethodGet, "/api/v1/users/999", "")
 
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -122,7 +122,7 @@ func TestGetUser_InvalidID(t *testing.T) {
 	testutil.SetupTestDB(t)
 	router := testutil.SetupRouter()
 
-	rec := performRequest(router, http.MethodGet, "/users/abc", "")
+	rec := performRequest(router, http.MethodGet, "/api/v1/users/abc", "")
 
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 }
@@ -132,9 +132,9 @@ func TestCreateUser_Success(t *testing.T) {
 	router := testutil.SetupRouter()
 
 	body := `{"name":"Charlie","email":"charlie@example.com","password":"pass123"}`
-	rec := performRequest(router, http.MethodPost, "/users", body)
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
 
-	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, http.StatusCreated, rec.Code)
 
 	created := decodeUser(t, rec.Body.Bytes())
 	assert.NotZero(t, created.Id)
@@ -146,7 +146,7 @@ func TestCreateUser_EmptyBody(t *testing.T) {
 	testutil.SetupTestDB(t)
 	router := testutil.SetupRouter()
 
-	rec := performRequest(router, http.MethodPost, "/users", "")
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", "")
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -157,7 +157,7 @@ func TestCreateUser_InvalidJSON(t *testing.T) {
 	testutil.SetupTestDB(t)
 	router := testutil.SetupRouter()
 
-	rec := performRequest(router, http.MethodPost, "/users", `{invalid`)
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", `{invalid`)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
@@ -167,7 +167,7 @@ func TestCreateUser_MissingName(t *testing.T) {
 	router := testutil.SetupRouter()
 
 	body := `{"email":"test@example.com","password":"pass123"}`
-	rec := performRequest(router, http.MethodPost, "/users", body)
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -180,7 +180,7 @@ func TestCreateUser_MissingEmail(t *testing.T) {
 	router := testutil.SetupRouter()
 
 	body := `{"name":"Charlie","password":"pass123"}`
-	rec := performRequest(router, http.MethodPost, "/users", body)
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -192,7 +192,7 @@ func TestCreateUser_InvalidEmail(t *testing.T) {
 	router := testutil.SetupRouter()
 
 	body := `{"name":"Charlie","email":"invalid-email","password":"pass123"}`
-	rec := performRequest(router, http.MethodPost, "/users", body)
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -204,7 +204,7 @@ func TestCreateUser_WeakPassword(t *testing.T) {
 	router := testutil.SetupRouter()
 
 	body := `{"name":"Charlie","email":"charlie@example.com","password":"pass"}`
-	rec := performRequest(router, http.MethodPost, "/users", body)
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -216,7 +216,7 @@ func TestCreateUser_MissingPassword(t *testing.T) {
 	router := testutil.SetupRouter()
 
 	body := `{"name":"Charlie","email":"charlie@example.com"}`
-	rec := performRequest(router, http.MethodPost, "/users", body)
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -230,7 +230,7 @@ func TestUpdateUser_Success(t *testing.T) {
 	user := testutil.SeedUser(t, db, "Alice", "alice@example.com", "oldpass")
 
 	body := `{"name":"Alice Updated","email":"alice.new@example.com","password":"newpass123"}`
-	rec := performRequest(router, http.MethodPut, fmt.Sprintf("/users/%d", user.Id), body)
+	rec := performRequest(router, http.MethodPut, fmt.Sprintf("/api/v1/users/%d", user.Id), body)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -245,7 +245,7 @@ func TestUpdateUser_NotFound(t *testing.T) {
 	router := testutil.SetupRouter()
 
 	body := `{"name":"Ghost","email":"ghost@example.com","password":"pass123"}`
-	rec := performRequest(router, http.MethodPut, "/users/404", body)
+	rec := performRequest(router, http.MethodPut, "/api/v1/users/404", body)
 
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -258,11 +258,11 @@ func TestDeleteUser_Success(t *testing.T) {
 
 	user := testutil.SeedUser(t, db, "Alice", "alice@example.com", "secret")
 
-	rec := performRequest(router, http.MethodDelete, fmt.Sprintf("/users/%d", user.Id), "")
+	rec := performRequest(router, http.MethodDelete, fmt.Sprintf("/api/v1/users/%d", user.Id), "")
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	getRec := performRequest(router, http.MethodGet, fmt.Sprintf("/users/%d", user.Id), "")
+	getRec := performRequest(router, http.MethodGet, fmt.Sprintf("/api/v1/users/%d", user.Id), "")
 	assert.Equal(t, http.StatusNotFound, getRec.Code)
 }
 
@@ -270,7 +270,7 @@ func TestDeleteUser_NotFound(t *testing.T) {
 	testutil.SetupTestDB(t)
 	router := testutil.SetupRouter()
 
-	rec := performRequest(router, http.MethodDelete, "/users/999", "")
+	rec := performRequest(router, http.MethodDelete, "/api/v1/users/999", "")
 
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 	errResp := decodeError(t, rec.Body.Bytes())
@@ -281,31 +281,31 @@ func TestUserCRUD_Flow(t *testing.T) {
 	testutil.SetupTestDB(t)
 	router := testutil.SetupRouter()
 
-	createRec := performRequest(router, http.MethodPost, "/users",
+	createRec := performRequest(router, http.MethodPost, "/api/v1/users",
 		`{"name":"Flow User","email":"flow@example.com","password":"flowpass123"}`)
-	require.Equal(t, http.StatusOK, createRec.Code)
+	require.Equal(t, http.StatusCreated, createRec.Code)
 
 	created := decodeUser(t, createRec.Body.Bytes())
 
-	listRec := performRequest(router, http.MethodGet, "/users", "")
+	listRec := performRequest(router, http.MethodGet, "/api/v1/users", "")
 	require.Equal(t, http.StatusOK, listRec.Code)
 	users := decodeUsers(t, listRec.Body.Bytes())
 	require.Len(t, users, 1)
 
-	getRec := performRequest(router, http.MethodGet, fmt.Sprintf("/users/%d", created.Id), "")
+	getRec := performRequest(router, http.MethodGet, fmt.Sprintf("/api/v1/users/%d", created.Id), "")
 	require.Equal(t, http.StatusOK, getRec.Code)
 
-	updateRec := performRequest(router, http.MethodPut, fmt.Sprintf("/users/%d", created.Id),
+	updateRec := performRequest(router, http.MethodPut, fmt.Sprintf("/api/v1/users/%d", created.Id),
 		`{"name":"Flow Updated","email":"flow.updated@example.com","password":"newflowpass123"}`)
 	require.Equal(t, http.StatusOK, updateRec.Code)
 
 	updated := decodeUser(t, updateRec.Body.Bytes())
 	assert.Equal(t, "Flow Updated", updated.Name)
 
-	deleteRec := performRequest(router, http.MethodDelete, fmt.Sprintf("/users/%d", created.Id), "")
+	deleteRec := performRequest(router, http.MethodDelete, fmt.Sprintf("/api/v1/users/%d", created.Id), "")
 	require.Equal(t, http.StatusOK, deleteRec.Code)
 
-	finalListRec := performRequest(router, http.MethodGet, "/users", "")
+	finalListRec := performRequest(router, http.MethodGet, "/api/v1/users", "")
 	require.Equal(t, http.StatusOK, finalListRec.Code)
 	finalUsers := decodeUsers(t, finalListRec.Body.Bytes())
 	assert.Empty(t, finalUsers)

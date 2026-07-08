@@ -1,15 +1,21 @@
-version: '3:8'
 services:
   db:
-   image: postgres
-   volumes:
-     - pgdata:/var/lib/postgresql/data
-   ports:
-     - "5555:5555"
-   environment:
-    - POSTGRES_PASSWORD:bismillah
-    - POSTGRES_DB:irfan-db
-    - POSTGRES_USER:postgres
+    image: postgres:16-alpine
+    restart: unless-stopped
+    pull_policy: missing
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: bismillah
+      POSTGRES_DB: irfan-db
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   pgdata:
-

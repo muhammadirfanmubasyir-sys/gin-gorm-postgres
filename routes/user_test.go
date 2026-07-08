@@ -17,11 +17,11 @@ func TestUserRoute_RegistersAllEndpoints(t *testing.T) {
 	}
 
 	expected := []string{
-		"GET /users",
-		"GET /users/:id",
-		"POST /users",
-		"PUT /users/:id",
-		"DELETE /users/:id",
+		"GET /api/v1/users",
+		"GET /api/v1/users/:id",
+		"POST /api/v1/users",
+		"PUT /api/v1/users/:id",
+		"DELETE /api/v1/users/:id",
 	}
 
 	for _, route := range expected {

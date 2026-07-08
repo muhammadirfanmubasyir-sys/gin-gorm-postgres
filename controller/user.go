@@ -45,7 +45,7 @@ func validate(name, email, password string) ValidationError {
 
 func GetUser(c *gin.Context) {
 	var user models.User
-	config.DB.Where("id = ?", c.Param("id")).First(&user)
+	config.DB.WithContext(c.Request.Context()).Where("id = ?", c.Param("id")).First(&user)
 
 	if user.Id == 0 {
 		c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
@@ -62,7 +62,7 @@ func GetUser(c *gin.Context) {
 
 func ListUser(c *gin.Context) {
 	users := []models.User{}
-	config.DB.Find(&users)
+	config.DB.WithContext(c.Request.Context()).Find(&users)
 
 	responses := make([]dto.UserResponse, len(users))
 	for i, user := range users {
@@ -98,7 +98,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	if result := config.DB.Create(&user); result.Error != nil {
+	if result := config.DB.WithContext(c.Request.Context()).Create(&user); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to create user", "INTERNAL_ERROR"))
 		return
 	}
@@ -108,19 +108,19 @@ func CreateUser(c *gin.Context) {
 		Name:  user.Name,
 		Email: user.Email,
 	}
-	c.JSON(http.StatusOK, dto.NewSuccessResponse(response))
+	c.JSON(http.StatusCreated, dto.NewSuccessResponse(response))
 }
 
 func DeleteUser(c *gin.Context) {
 	var user models.User
-	config.DB.Where("id = ?", c.Param("id")).First(&user)
+	config.DB.WithContext(c.Request.Context()).Where("id = ?", c.Param("id")).First(&user)
 
 	if user.Id == 0 {
 		c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
 		return
 	}
 
-	if result := config.DB.Delete(&user); result.Error != nil {
+	if result := config.DB.WithContext(c.Request.Context()).Delete(&user); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to delete user", "INTERNAL_ERROR"))
 		return
 	}
@@ -130,7 +130,7 @@ func DeleteUser(c *gin.Context) {
 
 func UpdateUser(c *gin.Context) {
 	var user models.User
-	config.DB.Where("id = ?", c.Param("id")).First(&user)
+	config.DB.WithContext(c.Request.Context()).Where("id = ?", c.Param("id")).First(&user)
 
 	if user.Id == 0 {
 		c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
@@ -156,7 +156,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if result := config.DB.Save(&user); result.Error != nil {
+	if result := config.DB.WithContext(c.Request.Context()).Save(&user); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to update user", "INTERNAL_ERROR"))
 		return
 	}
