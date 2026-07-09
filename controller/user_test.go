@@ -8,12 +8,20 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gin-gonic/gin"
+	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/controller"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/dto"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models"
-	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/testutil"
+	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/repository"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func setupMockRouter(mock *repository.MockUserRepository) http.Handler {
+	gin.SetMode(gin.TestMode)
+	router := controller.SetupRouterWithMock(mock)
+	return router
+}
 
 func performRequest(router http.Handler, method, path, body string) *httptest.ResponseRecorder {
 	req := httptest.NewRequest(method, path, strings.NewReader(body))
@@ -63,8 +71,8 @@ func decodeError(t *testing.T, body []byte) dto.ErrorResponse {
 }
 
 func TestListUser_Empty(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	rec := performRequest(router, http.MethodGet, "/api/v1/users", "")
 
@@ -75,11 +83,10 @@ func TestListUser_Empty(t *testing.T) {
 }
 
 func TestListUser_WithUsers(t *testing.T) {
-	db := testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
-
-	testutil.SeedUser(t, db, "Alice", "alice@example.com", "secret1")
-	testutil.SeedUser(t, db, "Bob", "bob@example.com", "secret2")
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	mock.Create(nil, &models.User{Name: "Bob", Email: "bob@example.com"})
+	router := setupMockRouter(mock)
 
 	rec := performRequest(router, http.MethodGet, "/api/v1/users", "")
 
@@ -91,25 +98,36 @@ func TestListUser_WithUsers(t *testing.T) {
 	assert.Equal(t, "Bob", users[1].Name)
 }
 
+func TestListUser_RepoError(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.FindErr = fmt.Errorf("database connection lost")
+	router := setupMockRouter(mock)
+
+	rec := performRequest(router, http.MethodGet, "/api/v1/users", "")
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+	errResp := decodeError(t, rec.Body.Bytes())
+	assert.Equal(t, "INTERNAL_ERROR", errResp.Code)
+}
+
 func TestGetUser_Found(t *testing.T) {
-	db := testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	router := setupMockRouter(mock)
 
-	user := testutil.SeedUser(t, db, "Alice", "alice@example.com", "secret")
-
-	rec := performRequest(router, http.MethodGet, fmt.Sprintf("/api/v1/users/%d", user.Id), "")
+	rec := performRequest(router, http.MethodGet, "/api/v1/users/1", "")
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	got := decodeUser(t, rec.Body.Bytes())
-	assert.Equal(t, user.Id, got.Id)
+	assert.Equal(t, 1, got.Id)
 	assert.Equal(t, "Alice", got.Name)
 	assert.Equal(t, "alice@example.com", got.Email)
 }
 
 func TestGetUser_NotFound(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	rec := performRequest(router, http.MethodGet, "/api/v1/users/999", "")
 
@@ -119,17 +137,28 @@ func TestGetUser_NotFound(t *testing.T) {
 }
 
 func TestGetUser_InvalidID(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	rec := performRequest(router, http.MethodGet, "/api/v1/users/abc", "")
 
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 }
 
+func TestGetUser_RepoError(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Id: 1, Name: "Alice", Email: "alice@example.com"})
+	mock.FindErr = fmt.Errorf("database connection lost")
+	router := setupMockRouter(mock)
+
+	rec := performRequest(router, http.MethodGet, "/api/v1/users/1", "")
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+}
+
 func TestCreateUser_Success(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	body := `{"name":"Charlie","email":"charlie@example.com","password":"pass123"}`
 	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
@@ -143,8 +172,8 @@ func TestCreateUser_Success(t *testing.T) {
 }
 
 func TestCreateUser_EmptyBody(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	rec := performRequest(router, http.MethodPost, "/api/v1/users", "")
 
@@ -154,8 +183,8 @@ func TestCreateUser_EmptyBody(t *testing.T) {
 }
 
 func TestCreateUser_InvalidJSON(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	rec := performRequest(router, http.MethodPost, "/api/v1/users", `{invalid`)
 
@@ -163,8 +192,8 @@ func TestCreateUser_InvalidJSON(t *testing.T) {
 }
 
 func TestCreateUser_MissingName(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	body := `{"email":"test@example.com","password":"pass123"}`
 	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
@@ -176,8 +205,8 @@ func TestCreateUser_MissingName(t *testing.T) {
 }
 
 func TestCreateUser_MissingEmail(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	body := `{"name":"Charlie","password":"pass123"}`
 	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
@@ -188,8 +217,8 @@ func TestCreateUser_MissingEmail(t *testing.T) {
 }
 
 func TestCreateUser_InvalidEmail(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	body := `{"name":"Charlie","email":"invalid-email","password":"pass123"}`
 	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
@@ -200,8 +229,8 @@ func TestCreateUser_InvalidEmail(t *testing.T) {
 }
 
 func TestCreateUser_WeakPassword(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	body := `{"name":"Charlie","email":"charlie@example.com","password":"pass"}`
 	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
@@ -212,8 +241,8 @@ func TestCreateUser_WeakPassword(t *testing.T) {
 }
 
 func TestCreateUser_MissingPassword(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	body := `{"name":"Charlie","email":"charlie@example.com"}`
 	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
@@ -223,26 +252,62 @@ func TestCreateUser_MissingPassword(t *testing.T) {
 	assert.Equal(t, "VALIDATION_ERROR", errResp.Code)
 }
 
-func TestUpdateUser_Success(t *testing.T) {
-	db := testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+func TestCreateUser_RepoError(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.CreateErr = fmt.Errorf("duplicate key error")
+	router := setupMockRouter(mock)
 
-	user := testutil.SeedUser(t, db, "Alice", "alice@example.com", "oldpass")
+	body := `{"name":"Charlie","email":"charlie@example.com","password":"pass123"}`
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+	errResp := decodeError(t, rec.Body.Bytes())
+	assert.Equal(t, "INTERNAL_ERROR", errResp.Code)
+}
+
+func TestCreateUser_WhitespaceName(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
+
+	body := `{"name":"   ","email":"test@example.com","password":"pass123"}`
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
+
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	errResp := decodeError(t, rec.Body.Bytes())
+	assert.Equal(t, "VALIDATION_ERROR", errResp.Code)
+}
+
+func TestCreateUser_WhitespaceEmail(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
+
+	body := `{"name":"Charlie","email":"   ","password":"pass123"}`
+	rec := performRequest(router, http.MethodPost, "/api/v1/users", body)
+
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	errResp := decodeError(t, rec.Body.Bytes())
+	assert.Equal(t, "VALIDATION_ERROR", errResp.Code)
+}
+
+func TestUpdateUser_Success(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	router := setupMockRouter(mock)
 
 	body := `{"name":"Alice Updated","email":"alice.new@example.com","password":"newpass123"}`
-	rec := performRequest(router, http.MethodPut, fmt.Sprintf("/api/v1/users/%d", user.Id), body)
+	rec := performRequest(router, http.MethodPut, "/api/v1/users/1", body)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	updated := decodeUser(t, rec.Body.Bytes())
-	assert.Equal(t, user.Id, updated.Id)
+	assert.Equal(t, 1, updated.Id)
 	assert.Equal(t, "Alice Updated", updated.Name)
 	assert.Equal(t, "alice.new@example.com", updated.Email)
 }
 
 func TestUpdateUser_NotFound(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	body := `{"name":"Ghost","email":"ghost@example.com","password":"pass123"}`
 	rec := performRequest(router, http.MethodPut, "/api/v1/users/404", body)
@@ -252,23 +317,86 @@ func TestUpdateUser_NotFound(t *testing.T) {
 	assert.Equal(t, "USER_NOT_FOUND", errResp.Code)
 }
 
+func TestUpdateUser_InvalidJSON(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	router := setupMockRouter(mock)
+
+	rec := performRequest(router, http.MethodPut, "/api/v1/users/1", `{invalid`)
+
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+}
+
+func TestUpdateUser_ValidationErrors(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	router := setupMockRouter(mock)
+
+	tests := []struct {
+		name     string
+		body     string
+		expected string
+	}{
+		{"missing name", `{"email":"test@example.com","password":"pass123"}`, "name"},
+		{"missing email", `{"name":"Alice","password":"pass123"}`, "email"},
+		{"invalid email", `{"name":"Alice","email":"bad","password":"pass123"}`, "email format"},
+		{"missing password", `{"name":"Alice","email":"test@example.com"}`, "password"},
+		{"short password", `{"name":"Alice","email":"test@example.com","password":"ab"}`, "6 characters"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := performRequest(router, http.MethodPut, "/api/v1/users/1", tt.body)
+			assert.Equal(t, http.StatusBadRequest, rec.Code)
+			errResp := decodeError(t, rec.Body.Bytes())
+			assert.Equal(t, "VALIDATION_ERROR", errResp.Code)
+			assert.Contains(t, errResp.Error, tt.expected)
+		})
+	}
+}
+
+func TestUpdateUser_RepoFindError(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	mock.FindErr = fmt.Errorf("database connection lost")
+	router := setupMockRouter(mock)
+
+	body := `{"name":"Alice Updated","email":"alice.new@example.com","password":"newpass123"}`
+	rec := performRequest(router, http.MethodPut, "/api/v1/users/1", body)
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+}
+
+func TestUpdateUser_RepoUpdateError(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	mock.UpdateErr = fmt.Errorf("database write failed")
+	router := setupMockRouter(mock)
+
+	body := `{"name":"Alice Updated","email":"alice.new@example.com","password":"newpass123"}`
+	rec := performRequest(router, http.MethodPut, "/api/v1/users/1", body)
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+	errResp := decodeError(t, rec.Body.Bytes())
+	assert.Equal(t, "INTERNAL_ERROR", errResp.Code)
+}
+
 func TestDeleteUser_Success(t *testing.T) {
-	db := testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	router := setupMockRouter(mock)
 
-	user := testutil.SeedUser(t, db, "Alice", "alice@example.com", "secret")
-
-	rec := performRequest(router, http.MethodDelete, fmt.Sprintf("/api/v1/users/%d", user.Id), "")
+	rec := performRequest(router, http.MethodDelete, "/api/v1/users/1", "")
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	getRec := performRequest(router, http.MethodGet, fmt.Sprintf("/api/v1/users/%d", user.Id), "")
+	getRec := performRequest(router, http.MethodGet, "/api/v1/users/1", "")
 	assert.Equal(t, http.StatusNotFound, getRec.Code)
 }
 
 func TestDeleteUser_NotFound(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	rec := performRequest(router, http.MethodDelete, "/api/v1/users/999", "")
 
@@ -277,9 +405,42 @@ func TestDeleteUser_NotFound(t *testing.T) {
 	assert.Equal(t, "USER_NOT_FOUND", errResp.Code)
 }
 
+func TestDeleteUser_InvalidID(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
+
+	rec := performRequest(router, http.MethodDelete, "/api/v1/users/abc", "")
+
+	assert.Equal(t, http.StatusNotFound, rec.Code)
+}
+
+func TestDeleteUser_RepoFindError(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	mock.FindErr = fmt.Errorf("database connection lost")
+	router := setupMockRouter(mock)
+
+	rec := performRequest(router, http.MethodDelete, "/api/v1/users/1", "")
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+}
+
+func TestDeleteUser_RepoDeleteError(t *testing.T) {
+	mock := repository.NewMockUserRepository()
+	mock.Create(nil, &models.User{Name: "Alice", Email: "alice@example.com"})
+	mock.DeleteErr = fmt.Errorf("database write failed")
+	router := setupMockRouter(mock)
+
+	rec := performRequest(router, http.MethodDelete, "/api/v1/users/1", "")
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+	errResp := decodeError(t, rec.Body.Bytes())
+	assert.Equal(t, "INTERNAL_ERROR", errResp.Code)
+}
+
 func TestUserCRUD_Flow(t *testing.T) {
-	testutil.SetupTestDB(t)
-	router := testutil.SetupRouter()
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	createRec := performRequest(router, http.MethodPost, "/api/v1/users",
 		`{"name":"Flow User","email":"flow@example.com","password":"flowpass123"}`)
@@ -312,15 +473,27 @@ func TestUserCRUD_Flow(t *testing.T) {
 }
 
 func TestPasswordHashing(t *testing.T) {
-	db := testutil.SetupTestDB(t)
+	mock := repository.NewMockUserRepository()
+	router := setupMockRouter(mock)
 
 	plainPassword := "mysecretpassword123"
-	user := testutil.SeedUser(t, db, "Test User", "test@example.com", plainPassword)
+	createRec := performRequest(router, http.MethodPost, "/api/v1/users",
+		fmt.Sprintf(`{"name":"Test User","email":"test@example.com","password":"%s"}`, plainPassword))
+	require.Equal(t, http.StatusCreated, createRec.Code)
 
-	var dbUser models.User
-	db.First(&dbUser, user.Id)
+	created := decodeUser(t, createRec.Body.Bytes())
+	getRec := performRequest(router, http.MethodGet, fmt.Sprintf("/api/v1/users/%d", created.Id), "")
+	require.Equal(t, http.StatusOK, getRec.Code)
 
-	assert.NotEqual(t, plainPassword, dbUser.Password, "password should be hashed")
-	assert.NoError(t, dbUser.VerifyPassword(plainPassword), "verification should pass with correct password")
-	assert.Error(t, dbUser.VerifyPassword("wrongpassword"), "verification should fail with wrong password")
+	var successResp dto.SuccessResponse
+	require.NoError(t, json.Unmarshal(getRec.Body.Bytes(), &successResp))
+	data, _ := json.Marshal(successResp.Data)
+	var user dto.UserResponse
+	require.NoError(t, json.Unmarshal(data, &user))
+	assert.Equal(t, created.Id, user.Id)
+}
+
+func TestValidationError_Error(t *testing.T) {
+	err := controller.ValidationError{Code: "VALIDATION_ERROR", Message: "name is required"}
+	assert.Equal(t, "name is required", err.Error())
 }

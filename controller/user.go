@@ -1,15 +1,26 @@
 package controller
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/config"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/dto"
 	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models"
+	"github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/repository"
+	"gorm.io/gorm"
 )
+
+type UserController struct {
+	repo repository.UserRepository
+}
+
+func NewUserController(repo repository.UserRepository) *UserController {
+	return &UserController{repo: repo}
+}
 
 type ValidationError struct {
 	Code    string
@@ -43,12 +54,20 @@ func validate(name, email, password string) ValidationError {
 	return ValidationError{}
 }
 
-func GetUser(c *gin.Context) {
-	var user models.User
-	config.DB.WithContext(c.Request.Context()).Where("id = ?", c.Param("id")).First(&user)
-
-	if user.Id == 0 {
+func (ctl *UserController) GetUser(c *gin.Context) {
+	id := 0
+	if _, err := fmt.Sscanf(c.Param("id"), "%d", &id); err != nil {
 		c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+		return
+	}
+
+	user, err := ctl.repo.FindByID(c.Request.Context(), id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+		} else {
+			c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("internal server error", "INTERNAL_ERROR"))
+		}
 		return
 	}
 
@@ -60,9 +79,12 @@ func GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.NewSuccessResponse(response))
 }
 
-func ListUser(c *gin.Context) {
-	users := []models.User{}
-	config.DB.WithContext(c.Request.Context()).Find(&users)
+func (ctl *UserController) ListUser(c *gin.Context) {
+	users, err := ctl.repo.FindAll(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("internal server error", "INTERNAL_ERROR"))
+		return
+	}
 
 	responses := make([]dto.UserResponse, len(users))
 	for i, user := range users {
@@ -76,7 +98,7 @@ func ListUser(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.NewSuccessResponse(responses))
 }
 
-func CreateUser(c *gin.Context) {
+func (ctl *UserController) CreateUser(c *gin.Context) {
 	var req dto.CreateUserRequest
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.NewErrorResponse("invalid request body", "INVALID_REQUEST"))
@@ -98,7 +120,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	if result := config.DB.WithContext(c.Request.Context()).Create(&user); result.Error != nil {
+	if err := ctl.repo.Create(c.Request.Context(), &user); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to create user", "INTERNAL_ERROR"))
 		return
 	}
@@ -111,16 +133,24 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, dto.NewSuccessResponse(response))
 }
 
-func DeleteUser(c *gin.Context) {
-	var user models.User
-	config.DB.WithContext(c.Request.Context()).Where("id = ?", c.Param("id")).First(&user)
-
-	if user.Id == 0 {
+func (ctl *UserController) DeleteUser(c *gin.Context) {
+	id := 0
+	if _, err := fmt.Sscanf(c.Param("id"), "%d", &id); err != nil {
 		c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
 		return
 	}
 
-	if result := config.DB.WithContext(c.Request.Context()).Delete(&user); result.Error != nil {
+	user, err := ctl.repo.FindByID(c.Request.Context(), id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+		} else {
+			c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("internal server error", "INTERNAL_ERROR"))
+		}
+		return
+	}
+
+	if err := ctl.repo.Delete(c.Request.Context(), &user); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to delete user", "INTERNAL_ERROR"))
 		return
 	}
@@ -128,12 +158,20 @@ func DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.NewSuccessResponse(map[string]string{"message": "user deleted successfully"}))
 }
 
-func UpdateUser(c *gin.Context) {
-	var user models.User
-	config.DB.WithContext(c.Request.Context()).Where("id = ?", c.Param("id")).First(&user)
-
-	if user.Id == 0 {
+func (ctl *UserController) UpdateUser(c *gin.Context) {
+	id := 0
+	if _, err := fmt.Sscanf(c.Param("id"), "%d", &id); err != nil {
 		c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+		return
+	}
+
+	user, err := ctl.repo.FindByID(c.Request.Context(), id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+		} else {
+			c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("internal server error", "INTERNAL_ERROR"))
+		}
 		return
 	}
 
@@ -156,7 +194,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if result := config.DB.WithContext(c.Request.Context()).Save(&user); result.Error != nil {
+	if err := ctl.repo.Update(c.Request.Context(), &user); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to update user", "INTERNAL_ERROR"))
 		return
 	}

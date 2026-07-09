@@ -1,0 +1,237 @@
+﻿
+         /\      Grafana   /ΓÇ╛ΓÇ╛/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ΓÇ╛ΓÇ╛\ 
+  /          \   |   (  |  (ΓÇ╛)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: benchmarks-loadtest\load-test\scripts\windows\k6.js
+        output: json (benchmarks-loadtest\load-test\results\k6\k6_output.json)
+
+     scenarios: (100.00%) 2 scenarios, 60 max VUs, 1m10s max duration (incl. graceful stop):
+              * crud: Up to 50 looping VUs for 40s over 3 stages (gracefulRampDown: 30s, exec: crudFlow, gracefulStop: 30s)
+              * health: 10 looping VUs for 30s (exec: healthCheck, gracefulStop: 30s)
+
+
+running (0m00.9s), 11/60 VUs, 4521 complete and 0 interrupted iterations
+crud     [   2% ] 01/50 VUs  00.9s/40.0s
+health   [   3% ] 10 VUs     00.9s/30s
+
+running (0m01.9s), 13/60 VUs, 8211 complete and 0 interrupted iterations
+crud     [   5% ] 03/50 VUs  01.9s/40.0s
+health   [   6% ] 10 VUs     01.9s/30s
+
+running (0m02.9s), 15/60 VUs, 10307 complete and 0 interrupted iterations
+crud     [   7% ] 05/50 VUs  02.9s/40.0s
+health   [  10% ] 10 VUs     02.9s/30s
+
+running (0m03.9s), 17/60 VUs, 11677 complete and 0 interrupted iterations
+crud     [  10% ] 07/50 VUs  03.9s/40.0s
+health   [  13% ] 10 VUs     03.9s/30s
+
+running (0m04.9s), 19/60 VUs, 13286 complete and 0 interrupted iterations
+crud     [  12% ] 09/50 VUs  04.9s/40.0s
+health   [  16% ] 10 VUs     04.9s/30s
+
+running (0m05.9s), 21/60 VUs, 14491 complete and 0 interrupted iterations
+crud     [  15% ] 11/50 VUs  05.9s/40.0s
+health   [  20% ] 10 VUs     05.9s/30s
+
+running (0m06.9s), 23/60 VUs, 15004 complete and 0 interrupted iterations
+crud     [  17% ] 13/50 VUs  06.9s/40.0s
+health   [  23% ] 10 VUs     06.9s/30s
+
+running (0m07.9s), 25/60 VUs, 16033 complete and 0 interrupted iterations
+crud     [  20% ] 15/50 VUs  07.9s/40.0s
+health   [  26% ] 10 VUs     07.9s/30s
+
+running (0m08.9s), 27/60 VUs, 16781 complete and 0 interrupted iterations
+crud     [  22% ] 17/50 VUs  08.9s/40.0s
+health   [  30% ] 10 VUs     08.9s/30s
+
+running (0m09.9s), 29/60 VUs, 17297 complete and 0 interrupted iterations
+crud     [  25% ] 19/50 VUs  09.9s/40.0s
+health   [  33% ] 10 VUs     09.9s/30s
+
+running (0m10.9s), 31/60 VUs, 18492 complete and 0 interrupted iterations
+crud     [  27% ] 21/50 VUs  10.9s/40.0s
+health   [  36% ] 10 VUs     10.9s/30s
+
+running (0m11.9s), 32/60 VUs, 18688 complete and 0 interrupted iterations
+crud     [  30% ] 22/50 VUs  11.9s/40.0s
+health   [  40% ] 10 VUs     11.9s/30s
+
+running (0m12.9s), 34/60 VUs, 20287 complete and 0 interrupted iterations
+crud     [  32% ] 24/50 VUs  12.9s/40.0s
+health   [  43% ] 10 VUs     12.9s/30s
+
+running (0m13.9s), 35/60 VUs, 20388 complete and 0 interrupted iterations
+crud     [  35% ] 25/50 VUs  13.9s/40.0s
+health   [  46% ] 10 VUs     13.9s/30s
+
+running (0m14.9s), 37/60 VUs, 20785 complete and 0 interrupted iterations
+crud     [  37% ] 27/50 VUs  14.9s/40.0s
+health   [  50% ] 10 VUs     14.9s/30s
+
+running (0m15.9s), 38/60 VUs, 22179 complete and 0 interrupted iterations
+crud     [  40% ] 28/50 VUs  15.9s/40.0s
+health   [  53% ] 10 VUs     15.9s/30s
+
+running (0m16.9s), 40/60 VUs, 22499 complete and 0 interrupted iterations
+crud     [  42% ] 30/50 VUs  16.9s/40.0s
+health   [  56% ] 10 VUs     16.9s/30s
+
+running (0m17.9s), 41/60 VUs, 22593 complete and 0 interrupted iterations
+crud     [  45% ] 31/50 VUs  17.9s/40.0s
+health   [  60% ] 10 VUs     17.9s/30s
+
+running (0m18.9s), 43/60 VUs, 22920 complete and 0 interrupted iterations
+crud     [  47% ] 33/50 VUs  18.9s/40.0s
+health   [  63% ] 10 VUs     18.9s/30s
+
+running (0m19.9s), 44/60 VUs, 23974 complete and 0 interrupted iterations
+crud     [  50% ] 34/50 VUs  19.9s/40.0s
+health   [  66% ] 10 VUs     19.9s/30s
+
+running (0m20.9s), 46/60 VUs, 24407 complete and 0 interrupted iterations
+crud     [  52% ] 36/50 VUs  20.9s/40.0s
+health   [  70% ] 10 VUs     20.9s/30s
+
+running (0m21.9s), 47/60 VUs, 24639 complete and 0 interrupted iterations
+crud     [  55% ] 37/50 VUs  21.9s/40.0s
+health   [  73% ] 10 VUs     21.9s/30s
+
+running (0m22.9s), 49/60 VUs, 24992 complete and 0 interrupted iterations
+crud     [  57% ] 39/50 VUs  22.9s/40.0s
+health   [  76% ] 10 VUs     22.9s/30s
+
+running (0m23.9s), 50/60 VUs, 26623 complete and 0 interrupted iterations
+crud     [  60% ] 40/50 VUs  23.9s/40.0s
+health   [  80% ] 10 VUs     23.9s/30s
+
+running (0m24.9s), 52/60 VUs, 27007 complete and 0 interrupted iterations
+crud     [  62% ] 42/50 VUs  24.9s/40.0s
+health   [  83% ] 10 VUs     24.9s/30s
+
+running (0m25.9s), 53/60 VUs, 27221 complete and 0 interrupted iterations
+crud     [  65% ] 43/50 VUs  25.9s/40.0s
+health   [  86% ] 10 VUs     25.9s/30s
+
+running (0m26.9s), 55/60 VUs, 27301 complete and 0 interrupted iterations
+crud     [  67% ] 45/50 VUs  26.9s/40.0s
+health   [  90% ] 10 VUs     26.9s/30s
+
+running (0m27.9s), 56/60 VUs, 27481 complete and 0 interrupted iterations
+crud     [  70% ] 46/50 VUs  27.9s/40.0s
+health   [  93% ] 10 VUs     27.9s/30s
+
+running (0m28.9s), 58/60 VUs, 28432 complete and 0 interrupted iterations
+crud     [  72% ] 48/50 VUs  28.9s/40.0s
+health   [  96% ] 10 VUs     28.9s/30s
+
+running (0m29.9s), 59/60 VUs, 29502 complete and 0 interrupted iterations
+crud     [  75% ] 49/50 VUs  29.9s/40.0s
+health   [ 100% ] 10 VUs     29.9s/30s
+
+running (0m30.9s), 50/60 VUs, 29543 complete and 0 interrupted iterations
+crud     [  77% ] 50/50 VUs  30.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m31.9s), 50/60 VUs, 29557 complete and 0 interrupted iterations
+crud     [  80% ] 50/50 VUs  31.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m32.9s), 48/60 VUs, 29572 complete and 0 interrupted iterations
+crud     [  82% ] 48/50 VUs  32.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m33.9s), 45/60 VUs, 29578 complete and 0 interrupted iterations
+crud     [  85% ] 45/50 VUs  33.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m34.9s), 40/60 VUs, 29585 complete and 0 interrupted iterations
+crud     [  87% ] 40/50 VUs  34.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m35.9s), 30/60 VUs, 29609 complete and 0 interrupted iterations
+crud     [  90% ] 30/50 VUs  35.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m36.9s), 20/60 VUs, 29627 complete and 0 interrupted iterations
+crud     [  92% ] 20/50 VUs  36.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m37.9s), 14/60 VUs, 29646 complete and 0 interrupted iterations
+crud     [  95% ] 14/50 VUs  37.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m38.9s), 07/60 VUs, 29659 complete and 0 interrupted iterations
+crud     [  97% ] 07/50 VUs  38.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+running (0m39.9s), 02/60 VUs, 29667 complete and 0 interrupted iterations
+crud     [ 100% ] 02/50 VUs  39.9s/40.0s
+health Γ£ô [ 100% ] 10 VUs     30s
+
+
+  Γûê THRESHOLDS 
+
+    errors
+    Γ£ô 'rate<0.1' rate=3.27%
+
+    http_req_duration
+    Γ£ô 'p(95)<500' p(95)=122.2ms
+    Γ£ù 'p(99)<1000' p(99)=1s
+
+
+  Γûê TOTAL RESULTS 
+
+    checks_total.......: 31026  761.236996/s
+    checks_succeeded...: 96.72% 30009 out of 31026
+    checks_failed......: 3.27%  1017 out of 31026
+
+    Γ£ô health status 200
+    Γ£ô create status 201
+    Γ£ô list status 200
+    Γ£ù get status 200
+      Γå│  0% ΓÇö Γ£ô 0 / Γ£ù 339
+    Γ£ù update status 200
+      Γå│  0% ΓÇö Γ£ô 0 / Γ£ù 339
+    Γ£ù delete status 200
+      Γå│  0% ΓÇö Γ£ô 0 / Γ£ù 339
+
+    CUSTOM
+    errors.........................: 3.27%  1017 out of 31026
+    req_duration...................: avg=40.68ms min=0s med=3.53ms max=3.86s p(90)=41.42ms p(95)=122.2ms
+
+    HTTP
+    http_req_duration..............: avg=40.68ms min=0s med=3.53ms max=3.86s p(90)=41.42ms p(95)=122.2ms
+      { expected_response:true }...: avg=27.47ms min=0s med=3.36ms max=3.86s p(90)=26.43ms p(95)=64.8ms 
+    http_req_failed................: 3.27%  1017 out of 31026
+    http_reqs......................: 31026  761.236996/s
+
+    EXECUTION
+    iteration_duration.............: avg=47.6ms  min=0s med=3.57ms max=8.25s p(90)=23.41ms p(95)=53.91ms
+    iterations.....................: 29670  727.96692/s
+    vus............................: 2      min=2             max=59
+    vus_max........................: 60     min=60            max=60
+
+    NETWORK
+    data_received..................: 11 MB  274 kB/s
+    data_sent......................: 2.5 MB 60 kB/s
+
+
+
+
+running (0m40.8s), 00/60 VUs, 29670 complete and 0 interrupted iterations
+crud   Γ£ô [ 100% ] 00/50 VUs  40s
+health Γ£ô [ 100% ] 10 VUs     30s
+k6 : time="2026-07-09T20:23:23+07:00" level=error msg="thresholds on metrics 'http_req_duration' have been crossed"
+At line:1 char:1
++ k6 run -e "BASE_URL=http://localhost:8080" --out json="benchmarks-loa ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (time="2026-07-0...e been crossed":String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

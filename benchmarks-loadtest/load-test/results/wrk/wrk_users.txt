@@ -1,0 +1,9 @@
+﻿Running 20s test @ http://172.18.96.1:8080/api/v1/users
+  4 threads and 50 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   110.94ms  169.23ms   1.33s    93.48%
+    Req/Sec   174.49    103.07   530.00     67.51%
+  13189 requests in 20.79s, 9.28MB read
+  Non-2xx or 3xx responses: 13089
+Requests/sec:    634.34
+Transfer/sec:    457.02KB

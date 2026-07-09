@@ -1,0 +1,27 @@
+﻿goos: windows
+goarch: amd64
+pkg: github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/controller
+cpu: 11th Gen Intel(R) Core(TM) i5-1145G7 @ 2.60GHz
+BenchmarkCreateUser-8       	       5	 222147420 ns/op	   28443 B/op	     120 allocs/op
+BenchmarkCreateUser-8       	       4	 337992550 ns/op	   30862 B/op	     123 allocs/op
+BenchmarkCreateUser-8       	       4	 363080850 ns/op	   21182 B/op	     117 allocs/op
+BenchmarkListUser_Empty-8   	   36432	     57291 ns/op	    6324 B/op	      22 allocs/op
+BenchmarkListUser_Empty-8   	   30789	     73996 ns/op	    6324 B/op	      22 allocs/op
+BenchmarkListUser_Empty-8   	   70978	     20758 ns/op	    6326 B/op	      22 allocs/op
+BenchmarkListUser_100-8     	    9595	    105979 ns/op	   28957 B/op	      24 allocs/op
+BenchmarkListUser_100-8     	    8659	    121583 ns/op	   28932 B/op	      24 allocs/op
+BenchmarkListUser_100-8     	   10000	    139315 ns/op	   28907 B/op	      24 allocs/op
+BenchmarkGetUser-8          	   46228	     22182 ns/op	    6523 B/op	      25 allocs/op
+BenchmarkGetUser-8          	   59353	     27144 ns/op	    6523 B/op	      25 allocs/op
+BenchmarkGetUser-8          	   46381	     27039 ns/op	    6523 B/op	      25 allocs/op
+BenchmarkUpdateUser-8       	       5	 208369320 ns/op	   28590 B/op	     122 allocs/op
+BenchmarkUpdateUser-8       	       5	 210650360 ns/op	   28590 B/op	     122 allocs/op
+BenchmarkUpdateUser-8       	       6	 196985650 ns/op	   26988 B/op	     121 allocs/op
+BenchmarkDeleteUser-8       	   22848	     52850 ns/op	    8610 B/op	      36 allocs/op
+BenchmarkDeleteUser-8       	   24109	     58922 ns/op	    8610 B/op	      36 allocs/op
+BenchmarkDeleteUser-8       	   21466	     52945 ns/op	    8610 B/op	      36 allocs/op
+BenchmarkCRUD_FullCycle-8   	       6	 209048817 ns/op	   49745 B/op	     236 allocs/op
+BenchmarkCRUD_FullCycle-8   	       3	 408590900 ns/op	   53346 B/op	     257 allocs/op
+BenchmarkCRUD_FullCycle-8   	       5	 258210260 ns/op	   65851 B/op	     248 allocs/op
+PASS
+ok  	github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/controller	68.170s

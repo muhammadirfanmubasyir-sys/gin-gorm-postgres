@@ -1,0 +1,67 @@
+﻿goos: windows
+goarch: amd64
+pkg: github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware
+cpu: 11th Gen Intel(R) Core(TM) i5-1145G7 @ 2.60GHz
+BenchmarkRequestID-8             	   61521	     17877 ns/op	    7033 B/op	      32 allocs/op
+BenchmarkRequestID-8             	   68007	     20888 ns/op	    7033 B/op	      32 allocs/op
+BenchmarkRequestID-8             	   75493	     21147 ns/op	    7033 B/op	      32 allocs/op
+BenchmarkCORS-8                  	   37654	     56751 ns/op	    7306 B/op	      32 allocs/op
+BenchmarkCORS-8                  	   10000	    113574 ns/op	    7306 B/op	      32 allocs/op
+BenchmarkCORS-8                  	   20976	     61695 ns/op	    7305 B/op	      32 allocs/op
+BenchmarkCORS_Preflight-8        	   27273	     41447 ns/op	    6798 B/op	      25 allocs/op
+BenchmarkCORS_Preflight-8        	   22004	     77357 ns/op	    6798 B/op	      25 allocs/op
+BenchmarkCORS_Preflight-8        	   77270	     21037 ns/op	    6798 B/op	      25 allocs/op
+BenchmarkSecurityHeaders-8       	   58940	     18916 ns/op	    6761 B/op	      31 allocs/op
+BenchmarkSecurityHeaders-8       	   57057	     20374 ns/op	    6761 B/op	      31 allocs/op
+BenchmarkSecurityHeaders-8       	   74613	     36166 ns/op	    6761 B/op	      31 allocs/op
+BenchmarkRateLimit-8             	   10000	    531326 ns/op	  289006 B/op	      29 allocs/op
+BenchmarkRateLimit-8             	   10000	    426031 ns/op	  289012 B/op	      29 allocs/op
+BenchmarkRateLimit-8             	   10000	    396153 ns/op	  289023 B/op	      29 allocs/op
+BenchmarkLogger-8                	   76496	     16633 ns/op	    6633 B/op	      29 allocs/op
+BenchmarkLogger-8                	   82922	     16641 ns/op	    6633 B/op	      29 allocs/op
+BenchmarkLogger-8                	   77173	     13960 ns/op	    6633 B/op	      29 allocs/op
+BenchmarkRecovery-8              	   89364	     13286 ns/op	    6553 B/op	      24 allocs/op
+BenchmarkRecovery-8              	   84356	     14314 ns/op	    6553 B/op	      24 allocs/op
+BenchmarkRecovery-8              	   74319	     16532 ns/op	    6553 B/op	      24 allocs/op
+BenchmarkErrorHandler-8          	   74014	     17041 ns/op	    6553 B/op	      24 allocs/op
+BenchmarkErrorHandler-8          	   63952	     15721 ns/op	    6553 B/op	      24 allocs/op
+BenchmarkErrorHandler-8          	   76458	     14303 ns/op	    6553 B/op	      24 allocs/op
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal 0xc0000005 code=0x0 addr=0x18 pc=0x7ff781908c89]
+
+goroutine 106 [running]:
+log.(*Logger).output(0xc000022540, 0x0, 0x2, 0xc00002da40)
+	C:/Golang/src/log/log.go:244 +0x449
+log.Printf({0x7ff781df71de?, 0xe?}, {0xc00017bab0?, 0xc0000b2150?, 0x0?})
+	C:/Golang/src/log/log.go:408 +0x67
+github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware.BenchmarkFullMiddlewareChain.Logger.func5(0xc0000a8200)
+	D:/PROJECTS/golang/projects/gin-gorm-postgres/middleware/middleware.go:16 +0xc5
+github.com/gin-gonic/gin.(*Context).Next(0xc0000a8200)
+	C:/Users/LENOVO L13 YOGA/go/pkg/mod/github.com/gin-gonic/gin@v1.11.0/context.go:192 +0x4e
+github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware.BenchmarkFullMiddlewareChain.SecurityHeaders.func4(0xc0000a8200)
+	D:/PROJECTS/golang/projects/gin-gorm-postgres/middleware/security.go:13 +0xe8
+github.com/gin-gonic/gin.(*Context).Next(0xc0000a8200)
+	C:/Users/LENOVO L13 YOGA/go/pkg/mod/github.com/gin-gonic/gin@v1.11.0/context.go:192 +0x4e
+github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware.BenchmarkFullMiddlewareChain.CORS.func3(0xc0000a8200)
+	D:/PROJECTS/golang/projects/gin-gorm-postgres/middleware/cors.go:38 +0x1e6
+github.com/gin-gonic/gin.(*Context).Next(0xc0000a8200)
+	C:/Users/LENOVO L13 YOGA/go/pkg/mod/github.com/gin-gonic/gin@v1.11.0/context.go:192 +0x4e
+github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware.BenchmarkFullMiddlewareChain.RequestID.func2(0xc0000a8200)
+	D:/PROJECTS/golang/projects/gin-gorm-postgres/middleware/requestid.go:19 +0xa5
+github.com/gin-gonic/gin.(*Context).Next(0xc0000a8200)
+	C:/Users/LENOVO L13 YOGA/go/pkg/mod/github.com/gin-gonic/gin@v1.11.0/context.go:192 +0x4e
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest(0xc000070340, 0xc0000a8200)
+	C:/Users/LENOVO L13 YOGA/go/pkg/mod/github.com/gin-gonic/gin@v1.11.0/gin.go:689 +0x435
+github.com/gin-gonic/gin.(*Engine).ServeHTTP(0xc000070340, {0x7ff781f2afa0, 0xc000034040}, 0xc0000b0140)
+	C:/Users/LENOVO L13 YOGA/go/pkg/mod/github.com/gin-gonic/gin@v1.11.0/gin.go:643 +0x1ad
+github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware.BenchmarkFullMiddlewareChain(0xc0000f0508)
+	D:/PROJECTS/golang/projects/gin-gorm-postgres/middleware/middleware_bench_test.go:138 +0x1f1
+testing.(*B).runN(0xc0000f0508, 0x1)
+	C:/Golang/src/testing/benchmark.go:219 +0x190
+testing.(*B).run1.func1()
+	C:/Golang/src/testing/benchmark.go:245 +0x48
+created by testing.(*B).run1 in goroutine 1
+	C:/Golang/src/testing/benchmark.go:238 +0x90
+exit status 2
+FAIL	github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware	51.658s
+FAIL

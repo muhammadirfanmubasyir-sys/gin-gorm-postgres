@@ -1,0 +1,1025 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/config/db.go (94.4%)</option>
+				
+				<option value="file1">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/controller/testhelper.go (100.0%)</option>
+				
+				<option value="file2">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/controller/user.go (93.4%)</option>
+				
+				<option value="file3">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/dto/response.go (100.0%)</option>
+				
+				<option value="file4">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/main.go (53.1%)</option>
+				
+				<option value="file5">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware/cors.go (100.0%)</option>
+				
+				<option value="file6">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware/middleware.go (100.0%)</option>
+				
+				<option value="file7">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware/ratelimit.go (100.0%)</option>
+				
+				<option value="file8">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware/requestid.go (100.0%)</option>
+				
+				<option value="file9">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware/security.go (100.0%)</option>
+				
+				<option value="file10">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models/user.go (85.7%)</option>
+				
+				<option value="file11">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/repository/mock.go (93.8%)</option>
+				
+				<option value="file12">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/repository/user_gorm.go (100.0%)</option>
+				
+				<option value="file13">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/routes/user.go (94.1%)</option>
+				
+				<option value="file14">github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/testutil/testutil.go (78.9%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package config
+
+import (
+        "fmt"
+        "os"
+        "strconv"
+        "time"
+
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models"
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+)
+
+var DB *gorm.DB
+
+func requireEnv(key string) string <span class="cov10" title="4">{
+        val := os.Getenv(key)
+        if val == "" </span><span class="cov8" title="3">{
+                panic(fmt.Sprintf("required environment variable %s is not set", key))</span>
+        }
+        <span class="cov1" title="1">return val</span>
+}
+
+func Connect() <span class="cov1" title="1">{
+        dsn := fmt.Sprintf(
+                "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+                requireEnv("DB_HOST"),
+                requireEnv("DB_PORT"),
+                requireEnv("DB_USER"),
+                requireEnv("DB_PASSWORD"),
+                requireEnv("DB_NAME"),
+                requireEnv("DB_SSLMODE"),
+        )
+
+        ConnectWithDialector(postgres.Open(dsn))
+}</span>
+
+func ConnectWithDriver(driver, dsn string) <span class="cov5" title="2">{
+        var dialector gorm.Dialector
+        switch driver </span>{
+        case "postgres":<span class="cov1" title="1">
+                dialector = postgres.Open(dsn)</span>
+        default:<span class="cov1" title="1">
+                panic(fmt.Sprintf("unsupported database driver: %s", driver))</span>
+        }
+
+        <span class="cov1" title="1">ConnectWithDialector(dialector)</span>
+}
+
+func ConnectWithDialector(dialector gorm.Dialector) <span class="cov10" title="4">{
+        db, err := gorm.Open(dialector, &amp;gorm.Config{})
+        if err != nil </span><span class="cov1" title="1">{
+                panic(fmt.Sprintf("failed to connect to database: %v", err))</span>
+        }
+
+        <span class="cov8" title="3">configureConnectionPool(db)
+
+        if err := db.AutoMigrate(&amp;models.User{}); err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("failed to auto-migrate: %v", err))</span>
+        }
+
+        <span class="cov8" title="3">DB = db</span>
+}
+
+func configureConnectionPool(db *gorm.DB) <span class="cov8" title="3">{
+        sqlDB, err := db.DB()
+        if err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("failed to get underlying sql.DB: %v", err))</span>
+        }
+
+        <span class="cov8" title="3">maxOpen, _ := strconv.Atoi(os.Getenv("DB_MAX_OPEN_CONNS"))
+        if maxOpen &lt;= 0 </span><span class="cov5" title="2">{
+                maxOpen = 25
+        }</span>
+        <span class="cov8" title="3">maxIdle, _ := strconv.Atoi(os.Getenv("DB_MAX_IDLE_CONNS"))
+        if maxIdle &lt;= 0 </span><span class="cov5" title="2">{
+                maxIdle = 10
+        }</span>
+        <span class="cov8" title="3">connMaxLifeSec, _ := strconv.Atoi(os.Getenv("DB_CONN_MAX_LIFETIME"))
+        if connMaxLifeSec &lt;= 0 </span><span class="cov5" title="2">{
+                connMaxLifeSec = 300
+        }</span>
+
+        <span class="cov8" title="3">sqlDB.SetMaxOpenConns(maxOpen)
+        sqlDB.SetMaxIdleConns(maxIdle)
+        sqlDB.SetConnMaxLifetime(time.Duration(connMaxLifeSec) * time.Second)</span>
+}
+
+func Close() <span class="cov5" title="2">{
+        if DB != nil </span><span class="cov1" title="1">{
+                if sqlDB, err := DB.DB(); err == nil </span><span class="cov1" title="1">{
+                        sqlDB.Close()
+                }</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package controller
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/repository"
+)
+
+func SetupRouterWithMock(mock repository.UserRepository) *gin.Engine <span class="cov10" title="31">{
+        gin.SetMode(gin.TestMode)
+        router := gin.New()
+
+        ctl := NewUserController(mock)
+
+        v1 := router.Group("/api/v1")
+        </span><span class="cov10" title="31">{
+                v1.GET("/users", ctl.ListUser)
+                v1.GET("/users/:id", ctl.GetUser)
+                v1.POST("/users", ctl.CreateUser)
+                v1.DELETE("/users/:id", ctl.DeleteUser)
+                v1.PUT("/users/:id", ctl.UpdateUser)
+        }</span>
+
+        <span class="cov10" title="31">return router</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package controller
+
+import (
+        "errors"
+        "fmt"
+        "net/http"
+        "regexp"
+        "strings"
+
+        "github.com/gin-gonic/gin"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/dto"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/repository"
+        "gorm.io/gorm"
+)
+
+type UserController struct {
+        repo repository.UserRepository
+}
+
+func NewUserController(repo repository.UserRepository) *UserController <span class="cov10" title="31">{
+        return &amp;UserController{repo: repo}
+}</span>
+
+type ValidationError struct {
+        Code    string
+        Message string
+}
+
+func (e ValidationError) Error() string <span class="cov5" title="6">{
+        return e.Message
+}</span>
+
+func validate(name, email, password string) ValidationError <span class="cov9" title="25">{
+        if strings.TrimSpace(name) == "" </span><span class="cov4" title="4">{
+                return ValidationError{Code: "VALIDATION_ERROR", Message: "name is required"}
+        }</span>
+        <span class="cov8" title="21">if strings.TrimSpace(email) == "" </span><span class="cov4" title="4">{
+                return ValidationError{Code: "VALIDATION_ERROR", Message: "email is required"}
+        }</span>
+
+        <span class="cov8" title="17">pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+        if matched, _ := regexp.MatchString(pattern, email); !matched </span><span class="cov3" title="3">{
+                return ValidationError{Code: "VALIDATION_ERROR", Message: "invalid email format"}
+        }</span>
+
+        <span class="cov7" title="14">if password == "" </span><span class="cov3" title="3">{
+                return ValidationError{Code: "VALIDATION_ERROR", Message: "password is required"}
+        }</span>
+        <span class="cov7" title="11">if len(password) &lt; 6 </span><span class="cov3" title="3">{
+                return ValidationError{Code: "VALIDATION_ERROR", Message: "password must be at least 6 characters"}
+        }</span>
+
+        <span class="cov6" title="8">return ValidationError{}</span>
+}
+
+func (ctl *UserController) GetUser(c *gin.Context) <span class="cov6" title="7">{
+        id := 0
+        if _, err := fmt.Sscanf(c.Param("id"), "%d", &amp;id); err != nil </span><span class="cov1" title="1">{
+                c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+                return
+        }</span>
+
+        <span class="cov5" title="6">user, err := ctl.repo.FindByID(c.Request.Context(), id)
+        if err != nil </span><span class="cov3" title="3">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov2" title="2">{
+                        c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+                }</span> else<span class="cov1" title="1"> {
+                        c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("internal server error", "INTERNAL_ERROR"))
+                }</span>
+                <span class="cov3" title="3">return</span>
+        }
+
+        <span class="cov3" title="3">response := dto.UserResponse{
+                Id:    user.Id,
+                Name:  user.Name,
+                Email: user.Email,
+        }
+        c.JSON(http.StatusOK, dto.NewSuccessResponse(response))</span>
+}
+
+func (ctl *UserController) ListUser(c *gin.Context) <span class="cov5" title="5">{
+        users, err := ctl.repo.FindAll(c.Request.Context())
+        if err != nil </span><span class="cov1" title="1">{
+                c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("internal server error", "INTERNAL_ERROR"))
+                return
+        }</span>
+
+        <span class="cov4" title="4">responses := make([]dto.UserResponse, len(users))
+        for i, user := range users </span><span class="cov3" title="3">{
+                responses[i] = dto.UserResponse{
+                        Id:    user.Id,
+                        Name:  user.Name,
+                        Email: user.Email,
+                }
+        }</span>
+
+        <span class="cov4" title="4">c.JSON(http.StatusOK, dto.NewSuccessResponse(responses))</span>
+}
+
+func (ctl *UserController) CreateUser(c *gin.Context) <span class="cov7" title="13">{
+        var req dto.CreateUserRequest
+        if err := c.BindJSON(&amp;req); err != nil </span><span class="cov2" title="2">{
+                c.JSON(http.StatusBadRequest, dto.NewErrorResponse("invalid request body", "INVALID_REQUEST"))
+                return
+        }</span>
+
+        <span class="cov7" title="11">if valErr := validate(req.Name, req.Email, req.Password); valErr.Code != "" </span><span class="cov6" title="7">{
+                c.JSON(http.StatusBadRequest, dto.NewErrorResponse(valErr.Message, valErr.Code))
+                return
+        }</span>
+
+        <span class="cov4" title="4">user := models.User{
+                Name:  req.Name,
+                Email: req.Email,
+        }
+
+        if err := user.HashPassword(req.Password); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to process password", "INTERNAL_ERROR"))
+                return
+        }</span>
+
+        <span class="cov4" title="4">if err := ctl.repo.Create(c.Request.Context(), &amp;user); err != nil </span><span class="cov1" title="1">{
+                c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to create user", "INTERNAL_ERROR"))
+                return
+        }</span>
+
+        <span class="cov3" title="3">response := dto.UserResponse{
+                Id:    user.Id,
+                Name:  user.Name,
+                Email: user.Email,
+        }
+        c.JSON(http.StatusCreated, dto.NewSuccessResponse(response))</span>
+}
+
+func (ctl *UserController) DeleteUser(c *gin.Context) <span class="cov5" title="6">{
+        id := 0
+        if _, err := fmt.Sscanf(c.Param("id"), "%d", &amp;id); err != nil </span><span class="cov1" title="1">{
+                c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+                return
+        }</span>
+
+        <span class="cov5" title="5">user, err := ctl.repo.FindByID(c.Request.Context(), id)
+        if err != nil </span><span class="cov2" title="2">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov1" title="1">{
+                        c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+                }</span> else<span class="cov1" title="1"> {
+                        c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("internal server error", "INTERNAL_ERROR"))
+                }</span>
+                <span class="cov2" title="2">return</span>
+        }
+
+        <span class="cov3" title="3">if err := ctl.repo.Delete(c.Request.Context(), &amp;user); err != nil </span><span class="cov1" title="1">{
+                c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to delete user", "INTERNAL_ERROR"))
+                return
+        }</span>
+
+        <span class="cov2" title="2">c.JSON(http.StatusOK, dto.NewSuccessResponse(map[string]string{"message": "user deleted successfully"}))</span>
+}
+
+func (ctl *UserController) UpdateUser(c *gin.Context) <span class="cov7" title="11">{
+        id := 0
+        if _, err := fmt.Sscanf(c.Param("id"), "%d", &amp;id); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+                return
+        }</span>
+
+        <span class="cov7" title="11">user, err := ctl.repo.FindByID(c.Request.Context(), id)
+        if err != nil </span><span class="cov2" title="2">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov1" title="1">{
+                        c.JSON(http.StatusNotFound, dto.NewErrorResponse("user not found", "USER_NOT_FOUND"))
+                }</span> else<span class="cov1" title="1"> {
+                        c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("internal server error", "INTERNAL_ERROR"))
+                }</span>
+                <span class="cov2" title="2">return</span>
+        }
+
+        <span class="cov6" title="9">var req dto.UpdateUserRequest
+        if err := c.BindJSON(&amp;req); err != nil </span><span class="cov1" title="1">{
+                c.JSON(http.StatusBadRequest, dto.NewErrorResponse("invalid request body", "INVALID_REQUEST"))
+                return
+        }</span>
+
+        <span class="cov6" title="8">if valErr := validate(req.Name, req.Email, req.Password); valErr.Code != "" </span><span class="cov5" title="5">{
+                c.JSON(http.StatusBadRequest, dto.NewErrorResponse(valErr.Message, valErr.Code))
+                return
+        }</span>
+
+        <span class="cov3" title="3">user.Name = req.Name
+        user.Email = req.Email
+
+        if err := user.HashPassword(req.Password); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to process password", "INTERNAL_ERROR"))
+                return
+        }</span>
+
+        <span class="cov3" title="3">if err := ctl.repo.Update(c.Request.Context(), &amp;user); err != nil </span><span class="cov1" title="1">{
+                c.JSON(http.StatusInternalServerError, dto.NewErrorResponse("failed to update user", "INTERNAL_ERROR"))
+                return
+        }</span>
+
+        <span class="cov2" title="2">response := dto.UserResponse{
+                Id:    user.Id,
+                Name:  user.Name,
+                Email: user.Email,
+        }
+        c.JSON(http.StatusOK, dto.NewSuccessResponse(response))</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package dto
+
+import "time"
+
+type ErrorResponse struct {
+        Error     string    `json:"error"`
+        Code      string    `json:"code"`
+        Timestamp time.Time `json:"timestamp"`
+}
+
+type SuccessResponse struct {
+        Data      interface{} `json:"data"`
+        Timestamp time.Time   `json:"timestamp"`
+}
+
+func NewErrorResponse(message, code string) ErrorResponse <span class="cov8" title="3">{
+        return ErrorResponse{
+                Error:     message,
+                Code:      code,
+                Timestamp: time.Now(),
+        }
+}</span>
+
+func NewSuccessResponse(data interface{}) SuccessResponse <span class="cov10" title="4">{
+        return SuccessResponse{
+                Data:      data,
+                Timestamp: time.Now(),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package main
+
+import (
+        "context"
+        "log"
+        "net/http"
+        "os"
+        "os/signal"
+        "syscall"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/joho/godotenv"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/config"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/routes"
+)
+
+func main() <span class="cov0" title="0">{
+        if err := godotenv.Load(); err != nil </span><span class="cov0" title="0">{
+                log.Println("Warning: .env file not found, using environment variables")
+        }</span>
+
+        <span class="cov0" title="0">config.Connect()
+        defer config.Close()
+
+        if err := run(); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("server error: %v", err)
+        }</span>
+}
+
+func run() error <span class="cov4" title="2">{
+        router := setupRouter()
+
+        addr := os.Getenv("SERVER_ADDR")
+        if addr == "" </span><span class="cov1" title="1">{
+                addr = ":8080"
+        }</span>
+
+        <span class="cov4" title="2">srv := &amp;http.Server{
+                Addr:         addr,
+                Handler:      router,
+                ReadTimeout:  15 * time.Second,
+                WriteTimeout: 15 * time.Second,
+                IdleTimeout:  60 * time.Second,
+        }
+
+        ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+        defer stop()
+
+        errCh := make(chan error, 1)
+        go func() </span><span class="cov4" title="2">{
+                log.Printf("server starting on %s", addr)
+                if err := srv.ListenAndServe(); err != nil &amp;&amp; err != http.ErrServerClosed </span><span class="cov0" title="0">{
+                        errCh &lt;- err
+                }</span>
+        }()
+
+        <span class="cov4" title="2">select </span>{
+        case err := &lt;-errCh:<span class="cov0" title="0">
+                return err</span>
+        case &lt;-ctx.Done():<span class="cov0" title="0"></span>
+        }
+
+        <span class="cov0" title="0">log.Println("shutting down server...")
+
+        shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+        defer cancel()
+
+        if err := srv.Shutdown(shutdownCtx); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">log.Println("server stopped")
+        return nil</span>
+}
+
+func setupRouter() *gin.Engine <span class="cov10" title="6">{
+        router := gin.New()
+
+        router.GET("/health", func(c *gin.Context) </span><span class="cov1" title="1">{
+                c.JSON(http.StatusOK, gin.H{
+                        "status":    "ok",
+                        "timestamp": time.Now(),
+                })
+        }</span>)
+
+        <span class="cov10" title="6">routes.UserRoute(router)
+
+        return router</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package middleware
+
+import (
+        "os"
+        "strings"
+
+        "github.com/gin-gonic/gin"
+)
+
+func CORS() gin.HandlerFunc <span class="cov8" title="4">{
+        return func(c *gin.Context) </span><span class="cov10" title="5">{
+                allowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
+                if allowedOrigins == "" </span><span class="cov7" title="3">{
+                        allowedOrigins = "*"
+                }</span>
+
+                <span class="cov10" title="5">origin := c.GetHeader("Origin")
+                if allowedOrigins == "*" </span><span class="cov7" title="3">{
+                        c.Header("Access-Control-Allow-Origin", "*")
+                }</span> else<span class="cov4" title="2"> {
+                        for _, o := range strings.Split(allowedOrigins, ",") </span><span class="cov7" title="3">{
+                                if strings.TrimSpace(o) == origin </span><span class="cov1" title="1">{
+                                        c.Header("Access-Control-Allow-Origin", origin)
+                                        break</span>
+                                }
+                        }
+                }
+
+                <span class="cov10" title="5">c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+                c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, X-Request-ID")
+                c.Header("Access-Control-Max-Age", "86400")
+
+                if c.Request.Method == "OPTIONS" </span><span class="cov1" title="1">{
+                        c.AbortWithStatus(204)
+                        return
+                }</span>
+
+                <span class="cov8" title="4">c.Next()</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package middleware
+
+import (
+        "log"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func Recovery() gin.HandlerFunc <span class="cov1" title="1">{
+        return gin.RecoveryWithWriter(gin.DefaultErrorWriter)
+}</span>
+
+func Logger() gin.HandlerFunc <span class="cov1" title="1">{
+        return func(c *gin.Context) </span><span class="cov1" title="1">{
+                log.Printf("%s %s %s", c.Request.Method, c.Request.URL.Path, c.Request.RemoteAddr)
+                c.Next()
+                log.Printf("%s %s %d", c.Request.Method, c.Request.URL.Path, c.Writer.Status())
+        }</span>
+}
+
+func ErrorHandler() gin.HandlerFunc <span class="cov10" title="2">{
+        return func(c *gin.Context) </span><span class="cov10" title="2">{
+                c.Next()
+
+                if c.Writer.Status() &gt;= http.StatusBadRequest </span><span class="cov1" title="1">{
+                        return
+                }</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package middleware
+
+import (
+        "net/http"
+        "sync"
+        "time"
+
+        "github.com/gin-gonic/gin"
+)
+
+type rateLimiter struct {
+        mu       sync.Mutex
+        requests map[string][]time.Time
+        limit    int
+        window   time.Duration
+}
+
+func newRateLimiter(limit int, window time.Duration) *rateLimiter <span class="cov5" title="4">{
+        return &amp;rateLimiter{
+                requests: make(map[string][]time.Time),
+                limit:    limit,
+                window:   window,
+        }
+}</span>
+
+func (rl *rateLimiter) allow(key string) bool <span class="cov8" title="11">{
+        rl.mu.Lock()
+        defer rl.mu.Unlock()
+
+        now := time.Now()
+        windowStart := now.Add(-rl.window)
+
+        reqs := rl.requests[key]
+        valid := make([]time.Time, 0, len(reqs))
+        for _, t := range reqs </span><span class="cov10" title="16">{
+                if t.After(windowStart) </span><span class="cov10" title="16">{
+                        valid = append(valid, t)
+                }</span>
+        }
+
+        <span class="cov8" title="11">if len(valid) &gt;= rl.limit </span><span class="cov1" title="1">{
+                rl.requests[key] = valid
+                return false
+        }</span>
+
+        <span class="cov8" title="10">rl.requests[key] = append(valid, now)
+        return true</span>
+}
+
+func RateLimit(requestsPerMinute int) gin.HandlerFunc <span class="cov5" title="4">{
+        limiter := newRateLimiter(requestsPerMinute, time.Minute)
+
+        return func(c *gin.Context) </span><span class="cov8" title="11">{
+                key := c.ClientIP()
+                if !limiter.allow(key) </span><span class="cov1" title="1">{
+                        c.JSON(http.StatusTooManyRequests, gin.H{
+                                "error":     "rate limit exceeded",
+                                "code":      "RATE_LIMIT_EXCEEDED",
+                                "timestamp": time.Now(),
+                        })
+                        c.Abort()
+                        return
+                }</span>
+                <span class="cov8" title="10">c.Next()</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package middleware
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+)
+
+const RequestIDKey = "X-Request-ID"
+
+func RequestID() gin.HandlerFunc <span class="cov10" title="3">{
+        return func(c *gin.Context) </span><span class="cov10" title="3">{
+                id := c.GetHeader(RequestIDKey)
+                if id == "" </span><span class="cov6" title="2">{
+                        id = uuid.New().String()
+                }</span>
+
+                <span class="cov10" title="3">c.Set(RequestIDKey, id)
+                c.Header(RequestIDKey, id)
+                c.Next()</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package middleware
+
+import "github.com/gin-gonic/gin"
+
+func SecurityHeaders() gin.HandlerFunc <span class="cov8" title="1">{
+        return func(c *gin.Context) </span><span class="cov8" title="1">{
+                c.Header("X-Content-Type-Options", "nosniff")
+                c.Header("X-Frame-Options", "DENY")
+                c.Header("X-XSS-Protection", "1; mode=block")
+                c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
+                c.Header("Cache-Control", "no-store, no-cache, must-revalidate")
+                c.Header("Pragma", "no-cache")
+                c.Next()
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package models
+
+import "golang.org/x/crypto/bcrypt"
+
+type User struct {
+        Id       int    `json:"id" gorm:"primary_key"`
+        Name     string `json:"name"`
+        Email    string `json:"email"`
+        Password string `json:"-"`
+}
+
+func (User) TableName() string <span class="cov1" title="1">{
+        return "table_of_user"
+}</span>
+
+func (u *User) HashPassword(plainPassword string) error <span class="cov10" title="6">{
+        hashed, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov10" title="6">u.Password = string(hashed)
+        return nil</span>
+}
+
+func (u *User) VerifyPassword(plainPassword string) error <span class="cov6" title="3">{
+        return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainPassword))
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package repository
+
+import (
+        "context"
+
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models"
+        "gorm.io/gorm"
+)
+
+type MockUserRepository struct {
+        Users      []models.User
+        NextID     int
+        CreateErr  error
+        UpdateErr  error
+        DeleteErr  error
+        FindErr    error
+}
+
+func NewMockUserRepository() *MockUserRepository <span class="cov10" title="10">{
+        return &amp;MockUserRepository{
+                Users:  []models.User{},
+                NextID: 1,
+        }
+}</span>
+
+func (m *MockUserRepository) FindAll(ctx context.Context) ([]models.User, error) <span class="cov5" title="3">{
+        if m.FindErr != nil </span><span class="cov1" title="1">{
+                return nil, m.FindErr
+        }</span>
+        <span class="cov3" title="2">result := make([]models.User, len(m.Users))
+        copy(result, m.Users)
+        return result, nil</span>
+}
+
+func (m *MockUserRepository) FindByID(ctx context.Context, id int) (models.User, error) <span class="cov5" title="3">{
+        if m.FindErr != nil </span><span class="cov1" title="1">{
+                return models.User{}, m.FindErr
+        }</span>
+        <span class="cov3" title="2">for _, u := range m.Users </span><span class="cov1" title="1">{
+                if u.Id == id </span><span class="cov1" title="1">{
+                        return u, nil
+                }</span>
+        }
+        <span class="cov1" title="1">return models.User{}, gorm.ErrRecordNotFound</span>
+}
+
+func (m *MockUserRepository) Create(ctx context.Context, user *models.User) error <span class="cov9" title="8">{
+        if m.CreateErr != nil </span><span class="cov1" title="1">{
+                return m.CreateErr
+        }</span>
+        <span class="cov8" title="7">user.Id = m.NextID
+        m.NextID++
+        m.Users = append(m.Users, *user)
+        return nil</span>
+}
+
+func (m *MockUserRepository) Update(ctx context.Context, user *models.User) error <span class="cov3" title="2">{
+        if m.UpdateErr != nil </span><span class="cov1" title="1">{
+                return m.UpdateErr
+        }</span>
+        <span class="cov1" title="1">for i, u := range m.Users </span><span class="cov1" title="1">{
+                if u.Id == user.Id </span><span class="cov1" title="1">{
+                        m.Users[i] = *user
+                        return nil
+                }</span>
+        }
+        <span class="cov0" title="0">return gorm.ErrRecordNotFound</span>
+}
+
+func (m *MockUserRepository) Delete(ctx context.Context, user *models.User) error <span class="cov3" title="2">{
+        if m.DeleteErr != nil </span><span class="cov1" title="1">{
+                return m.DeleteErr
+        }</span>
+        <span class="cov1" title="1">for i, u := range m.Users </span><span class="cov1" title="1">{
+                if u.Id == user.Id </span><span class="cov1" title="1">{
+                        m.Users = append(m.Users[:i], m.Users[i+1:]...)
+                        return nil
+                }</span>
+        }
+        <span class="cov0" title="0">return gorm.ErrRecordNotFound</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package repository
+
+import (
+        "context"
+
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models"
+        "gorm.io/gorm"
+)
+
+type UserRepositoryGorm struct {
+        db *gorm.DB
+}
+
+func NewUserRepositoryGorm(db *gorm.DB) *UserRepositoryGorm <span class="cov10" title="7">{
+        return &amp;UserRepositoryGorm{db: db}
+}</span>
+
+func (r *UserRepositoryGorm) FindAll(ctx context.Context) ([]models.User, error) <span class="cov4" title="2">{
+        var users []models.User
+        err := r.db.WithContext(ctx).Find(&amp;users).Error
+        return users, err
+}</span>
+
+func (r *UserRepositoryGorm) FindByID(ctx context.Context, id int) (models.User, error) <span class="cov7" title="4">{
+        var user models.User
+        err := r.db.WithContext(ctx).Where("id = ?", id).First(&amp;user).Error
+        return user, err
+}</span>
+
+func (r *UserRepositoryGorm) Create(ctx context.Context, user *models.User) error <span class="cov9" title="6">{
+        return r.db.WithContext(ctx).Create(user).Error
+}</span>
+
+func (r *UserRepositoryGorm) Update(ctx context.Context, user *models.User) error <span class="cov1" title="1">{
+        return r.db.WithContext(ctx).Save(user).Error
+}</span>
+
+func (r *UserRepositoryGorm) Delete(ctx context.Context, user *models.User) error <span class="cov1" title="1">{
+        return r.db.WithContext(ctx).Delete(user).Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package routes
+
+import (
+        "os"
+        "strconv"
+
+        "github.com/gin-gonic/gin"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/config"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/controller"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/middleware"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/repository"
+)
+
+func UserRoute(router *gin.Engine) <span class="cov8" title="1">{
+        router.Use(middleware.RequestID())
+        router.Use(middleware.CORS())
+        router.Use(middleware.SecurityHeaders())
+        router.Use(middleware.Logger())
+
+        rateLimit := 100
+        if v, err := strconv.Atoi(os.Getenv("RATE_LIMIT_PER_MINUTE")); err == nil &amp;&amp; v &gt; 0 </span><span class="cov0" title="0">{
+                rateLimit = v
+        }</span>
+        <span class="cov8" title="1">router.Use(middleware.RateLimit(rateLimit))
+
+        repo := repository.NewUserRepositoryGorm(config.DB)
+        ctl := controller.NewUserController(repo)
+
+        v1 := router.Group("/api/v1")
+        </span><span class="cov8" title="1">{
+                v1.GET("/users", ctl.ListUser)
+                v1.GET("/users/:id", ctl.GetUser)
+                v1.POST("/users", ctl.CreateUser)
+                v1.DELETE("/users/:id", ctl.DeleteUser)
+                v1.PUT("/users/:id", ctl.UpdateUser)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package testutil
+
+import (
+        "testing"
+
+        "github.com/gin-gonic/gin"
+        "github.com/glebarez/sqlite"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/config"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models"
+        "github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/routes"
+        "gorm.io/gorm"
+)
+
+func SetupTestDB(t *testing.T) *gorm.DB <span class="cov10" title="12">{
+        t.Helper()
+
+        db, err := gorm.Open(sqlite.Open(":memory:"), &amp;gorm.Config{})
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("failed to open test db: %v", err)
+        }</span>
+
+        <span class="cov10" title="12">if err := db.AutoMigrate(&amp;models.User{}); err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("failed to migrate test db: %v", err)
+        }</span>
+
+        <span class="cov10" title="12">config.DB = db
+        return db</span>
+}
+
+func SetupRouter() *gin.Engine <span class="cov7" title="6">{
+        gin.SetMode(gin.TestMode)
+        router := gin.New()
+        routes.UserRoute(router)
+        return router
+}</span>
+
+func SeedUser(t *testing.T, db *gorm.DB, name, email, password string) models.User <span class="cov9" title="10">{
+        t.Helper()
+
+        user := models.User{
+                Name:  name,
+                Email: email,
+        }
+
+        if err := user.HashPassword(password); err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("failed to hash password: %v", err)
+        }</span>
+
+        <span class="cov9" title="10">if err := db.Create(&amp;user).Error; err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("failed to seed user: %v", err)
+        }</span>
+
+        <span class="cov9" title="10">return user</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

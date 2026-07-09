@@ -1,0 +1,15 @@
+﻿goos: windows
+goarch: amd64
+pkg: github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models
+cpu: 11th Gen Intel(R) Core(TM) i5-1145G7 @ 2.60GHz
+BenchmarkHashPassword-8             	       5	 200183980 ns/op	    5419 B/op	      10 allocs/op
+BenchmarkHashPassword-8             	       5	 221773740 ns/op	    5464 B/op	      10 allocs/op
+BenchmarkHashPassword-8             	       4	 253632050 ns/op	    5530 B/op	      11 allocs/op
+BenchmarkVerifyPassword_Correct-8   	       4	 406883200 ns/op	    5204 B/op	      11 allocs/op
+BenchmarkVerifyPassword_Correct-8   	       3	 359999967 ns/op	    5205 B/op	      11 allocs/op
+BenchmarkVerifyPassword_Correct-8   	       6	 241239300 ns/op	    5205 B/op	      11 allocs/op
+BenchmarkVerifyPassword_Wrong-8     	       5	 228538560 ns/op	    5251 B/op	      11 allocs/op
+BenchmarkVerifyPassword_Wrong-8     	       4	 331963400 ns/op	    5204 B/op	      11 allocs/op
+BenchmarkVerifyPassword_Wrong-8     	       5	 270687340 ns/op	    5251 B/op	      11 allocs/op
+PASS
+ok  	github.com/muhammadirfanmubasyir-sys/gin-gorm-postgres/models	34.499s

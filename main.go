@@ -23,6 +23,12 @@ func main() {
 	config.Connect()
 	defer config.Close()
 
+	if err := run(); err != nil {
+		log.Fatalf("server error: %v", err)
+	}
+}
+
+func run() error {
 	router := setupRouter()
 
 	addr := os.Getenv("SERVER_ADDR")
@@ -41,24 +47,31 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	errCh := make(chan error, 1)
 	go func() {
 		log.Printf("server starting on %s", addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("failed to start server: %v", err)
+			errCh <- err
 		}
 	}()
 
-	<-ctx.Done()
+	select {
+	case err := <-errCh:
+		return err
+	case <-ctx.Done():
+	}
+
 	log.Println("shutting down server...")
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("server forced to shutdown: %v", err)
+		return err
 	}
 
 	log.Println("server stopped")
+	return nil
 }
 
 func setupRouter() *gin.Engine {
